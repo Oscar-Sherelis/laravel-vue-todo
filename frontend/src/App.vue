@@ -72,7 +72,6 @@ const currentTasks = computed(() =>
 
 const handleTabChange = async (tab: 'todo' | 'completed') => {
   activeTab.value = tab
-  await tasksStore.fetchTasks(tab === 'completed')
 }
 
 const handleCreateTask = async (taskData: { title: string; description: string }) => {
@@ -88,7 +87,7 @@ const handleDeleteTask = async (taskId: number) => {
 }
 
 onMounted(async () => {
-  await tasksStore.fetchTasks(false)
+  await tasksStore.fetchAllTasks()
 })
 </script>
 

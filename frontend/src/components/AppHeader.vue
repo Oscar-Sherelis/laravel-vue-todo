@@ -1,17 +1,12 @@
 <template>
-  <v-app-bar
-    color="primary"
-    density="comfortable"
-    elevation="2"
-  >
-    <v-app-bar-title class="text-h5 font-weight-bold">
-      📝 To-Do App
-    </v-app-bar-title>
+  <v-app-bar color="primary" density="comfortable" elevation="2">
+    <v-app-bar-title class="text-h5 font-weight-bold"> 📝 To-Do App </v-app-bar-title>
 
     <v-spacer />
 
     <v-btn-toggle
-      v-model="activeTab"
+      :model-value="activeTab"
+      @update:model-value="handleTabChange"
       color="white"
       variant="outlined"
       divided
@@ -21,7 +16,7 @@
         <v-icon left>mdi-format-list-bulleted</v-icon>
         To-Do ({{ todoCount }})
       </v-btn>
-      
+
       <v-btn value="completed" @click="$emit('tab-change', 'completed')">
         <v-icon left>mdi-check-circle</v-icon>
         Completed ({{ completedCount }})
@@ -37,8 +32,13 @@ interface Props {
   completedCount: number
 }
 
+const handleTabChange = (tab: 'todo' | 'completed') => {
+  emit('tab-change', tab)
+}
+
 defineProps<Props>()
-defineEmits<{
+
+const emit = defineEmits<{
   'tab-change': [tab: 'todo' | 'completed']
 }>()
 </script>

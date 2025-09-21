@@ -7,9 +7,7 @@ export const useTasksStore = defineStore('tasks', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
-  // Computed
   const todoTasks = computed(() => tasks.value.filter((task) => !task.is_completed))
-
   const completedTasks = computed(() => tasks.value.filter((task) => task.is_completed))
 
   // Actions
@@ -21,14 +19,36 @@ export const useTasksStore = defineStore('tasks', () => {
       const response = await apiService.getTasks(completed)
 
       if (completed) {
-        // Replace completed tasks
-        tasks.value = tasks.value.filter((t) => !t.is_completed).concat(response.data)
+        // Keep todo tasks, replace completed tasks
+        const todoTasksOnly = tasks.value.filter((t) => !t.is_completed)
+        tasks.value = [...todoTasksOnly, ...response.data]
       } else {
-        // Replace todo tasks
-        tasks.value = tasks.value.filter((t) => t.is_completed).concat(response.data)
+        // Keep completed tasks, replace todo tasks  
+        const completedTasksOnly = tasks.value.filter((t) => t.is_completed)
+        tasks.value = [...response.data, ...completedTasksOnly]
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch tasks'
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function fetchAllTasks() {
+    loading.value = true
+    error.value = null
+
+    try {
+      // Load both types in parallel
+      const [todoResponse, completedResponse] = await Promise.all([
+        apiService.getTasks(false),  // Get todo tasks
+        apiService.getTasks(true)    // Get completed tasks
+      ])
+
+      // Combine both arrays
+      tasks.value = [...todoResponse.data, ...completedResponse.data]
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to fetch all tasks'
     } finally {
       loading.value = false
     }
@@ -96,6 +116,7 @@ export const useTasksStore = defineStore('tasks', () => {
 
     // Actions
     fetchTasks,
+    fetchAllTasks,
     createTask,
     toggleTask,
     deleteTask,
