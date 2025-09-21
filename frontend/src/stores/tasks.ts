@@ -8,28 +8,24 @@ export const useTasksStore = defineStore('tasks', () => {
   const error = ref<string | null>(null)
 
   // Computed
-  const todoTasks = computed(() => 
-    tasks.value.filter(task => !task.is_completed)
-  )
-  
-  const completedTasks = computed(() => 
-    tasks.value.filter(task => task.is_completed)
-  )
+  const todoTasks = computed(() => tasks.value.filter((task) => !task.is_completed))
+
+  const completedTasks = computed(() => tasks.value.filter((task) => task.is_completed))
 
   // Actions
   async function fetchTasks(completed: boolean = false) {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await apiService.getTasks(completed)
-      
+
       if (completed) {
         // Replace completed tasks
-        tasks.value = tasks.value.filter(t => !t.is_completed).concat(response.data)
+        tasks.value = tasks.value.filter((t) => !t.is_completed).concat(response.data)
       } else {
         // Replace todo tasks
-        tasks.value = tasks.value.filter(t => t.is_completed).concat(response.data)
+        tasks.value = tasks.value.filter((t) => t.is_completed).concat(response.data)
       }
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to fetch tasks'
@@ -41,7 +37,7 @@ export const useTasksStore = defineStore('tasks', () => {
   async function createTask(taskData: { title: string; description?: string }) {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await apiService.createTask(taskData)
       tasks.value.unshift(response.data)
@@ -55,12 +51,11 @@ export const useTasksStore = defineStore('tasks', () => {
   async function toggleTask(taskId: number) {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await apiService.toggleTask(taskId)
-      
-      // Update task in store
-      const index = tasks.value.findIndex(t => t.id === taskId)
+
+      const index = tasks.value.findIndex((t) => t.id === taskId)
       if (index !== -1) {
         tasks.value[index] = response.data
       }
@@ -74,10 +69,10 @@ export const useTasksStore = defineStore('tasks', () => {
   async function deleteTask(taskId: number) {
     loading.value = true
     error.value = null
-    
+
     try {
       await apiService.deleteTask(taskId)
-      tasks.value = tasks.value.filter(t => t.id !== taskId)
+      tasks.value = tasks.value.filter((t) => t.id !== taskId)
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to delete task'
     } finally {
@@ -94,16 +89,16 @@ export const useTasksStore = defineStore('tasks', () => {
     tasks,
     loading,
     error,
-    
+
     // Computed
     todoTasks,
     completedTasks,
-    
+
     // Actions
     fetchTasks,
     createTask,
     toggleTask,
     deleteTask,
-    clearError
+    clearError,
   }
 })

@@ -16,16 +16,13 @@ export interface ApiResponse<T> {
 }
 
 class ApiService {
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`
-    
+
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...options.headers,
       },
       ...options,
@@ -38,12 +35,13 @@ class ApiService {
     return response.json()
   }
 
-  // Task API methods
   async getTasks(completed: boolean = false): Promise<ApiResponse<Task[]>> {
     return this.request<ApiResponse<Task[]>>(`/tasks?completed=${completed}`)
   }
 
-  async createTask(task: Omit<Task, 'id' | 'is_completed' | 'created_at' | 'updated_at'>): Promise<ApiResponse<Task>> {
+  async createTask(
+    task: Omit<Task, 'id' | 'is_completed' | 'created_at' | 'updated_at'>,
+  ): Promise<ApiResponse<Task>> {
     return this.request<ApiResponse<Task>>('/tasks', {
       method: 'POST',
       body: JSON.stringify(task),
