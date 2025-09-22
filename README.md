@@ -86,7 +86,7 @@ cd ../frontend
 ```bash
 npm install
 ```
-2. Run:
+3. Run:
 ```bash
 npm run dev
 ```
